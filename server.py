@@ -1,18 +1,23 @@
 from flask import Flask, request, jsonify
-import main
+from waitress import serve
+from main import process_docx
 
 app = Flask(__name__)
-
+PORT = "80"
 
 
 @app.route('/process', methods=['POST'])
 def process():
-    json_data = request.json
+    """
+    gets data from the automation and process the docx content to fill the fields
+    """
     request_content: dict = request.data.decode()
     print(request_content)
     docx_content = request_content["file"]
-    modified_docx_content = main.process_docx(json_data, docx_content)
+    fields = request_content["fields"]
+    modified_docx_content = process_docx(fields, docx_content)
     return modified_docx_content
 
 if __name__ == '__main__':
     app.run(debug=True)
+    # serve(app, host = "0.0.0.0", port = PORT)
