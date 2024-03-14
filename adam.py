@@ -20,5 +20,4 @@ try:
 except:
    print("already gone")
 
-
 doc.save("delete.docx")
