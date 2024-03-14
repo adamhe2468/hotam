@@ -18,5 +18,5 @@ def process():
     return modified_docx_content
 
 if __name__ == '__main__':
-    app.run(debug=True)
-    # serve(app, host = "0.0.0.0", port = PORT)
+   # app.run(debug=True)
+     serve(app, host = "0.0.0.0", port = PORT)
