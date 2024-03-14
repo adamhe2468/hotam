@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from waitress import serve
 from main import process_docx
+import base64
 
 app = Flask(__name__)
 PORT = "80"
@@ -16,9 +17,10 @@ def process():
     """
     request_content: dict = request.data.decode()
     print(request_content)
-    docx_content = request_content["file"]
-    fields = request_content["fields"]
-    modified_docx_content = process_docx(fields, docx_content)
+    docx_content:bytes = base64.b64decode(request_content["file"])  # ["$content"]
+    fields:dict = request_content["fields"]
+
+    modified_docx_content:bytes = process_docx(fields, docx_content)
     return {"file" : modified_docx_content}
 
 if __name__ == '__main__':
