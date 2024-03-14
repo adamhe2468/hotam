@@ -1,6 +1,6 @@
 from docx import Document
 
-def process_docx(fields, docx_content):
+def process_docx(fields:dict, docx_content:bytes):
     doc = Document(docx_content)
 
     # Iterate through each content control in the document
