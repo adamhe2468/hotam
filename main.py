@@ -14,8 +14,9 @@ def process_docx(fields:dict, docx_content:bytes) -> bytes:
                 # Replace the content control text if it matches the key
                 if cc.text == f"[{key}]":
                     cc.text = value
-                    # Break the loop to avoid unnecessary checks
-                    break
-    print(doc, dir(doc))
-    return doc
+
+    modified_docx_buffer = BytesIO()
+    doc.save(modified_docx_buffer)
+    modified_docx_content = modified_docx_buffer.getvalue()                 
+    return modified_docx_content
 
