@@ -7,19 +7,12 @@ from ast import literal_eval
 app = Flask(__name__)
 PORT = "80"
 
-@app.route('/', methods=['GET'])
-def check():
-   return {"OK" : 200}
-
 @app.route('/process', methods=['POST'])
 def process():
     """
     gets data from the automation and process the docx content to fill the fields
     """
-    request_content = request.data
-    
-    # request_content = request.get_json()
-    print(request_content)
+    request_content = request.get_json()
     docx_content = base64.b64decode(request_content["file"]["$content"])
     fields = request_content["fields"]
         
