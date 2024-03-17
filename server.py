@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from waitress import serve
 from main import process_docx,add_img_to_cc
 import base64
+import json
 app = Flask(__name__)
 PORT = "80"
 
@@ -14,8 +15,6 @@ def process():
     docx_content = base64.b64decode(request_content["file"]["$content"])
     docx_type =request_content["file"]["$content-type"]
     fields = request_content["fields"]
-    import json
-
   
 
 # Parse the JSON string into a list of dictionaries
@@ -25,8 +24,6 @@ def process():
     dictionary = {}
     for item in json_list:
      dictionary[item['key']] = item['value']
-    
-    print(dictionary)    
     modified_docx_content = process_docx(dictionary, docx_content)
         
         # Encode the modified DOCX content
