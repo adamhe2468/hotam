@@ -41,10 +41,8 @@ def process_docx(fields:dict, docx_content:bytes) -> bytes:
     for paragraph in doc.paragraphs:
         for cc in paragraph._element.xpath("w:sdt/w:sdtContent/w:r/w:t"):
             # Check each field for a match
-            for field in fields:
-                key = field["key"]
-                value = field["value"]
-                # Replace the content control text if it matches the key
+            i = 0
+            for key,value in fields.items():
                 if cc.text == f"[{key}]":
                     cc.text = value
 
