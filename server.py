@@ -15,6 +15,7 @@ def process():
     """
     request_content = request.get_json()
     docx_content = base64.b64decode(request_content["file"]["$content"])
+    docx_type =request_content["file"]["$content-type"]
     fields = request_content["fields"]
     import json
 
@@ -34,7 +35,7 @@ def process():
         # Encode the modified DOCX content
     modified_docx_encoded = base64.b64encode(modified_docx_content).decode('utf-8')
         
-    return jsonify({"file": modified_docx_encoded})
+    return jsonify({"file": {    "$content-type": docx_type,"$content": modified_docx_encoded}})
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=PORT)
