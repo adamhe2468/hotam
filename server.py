@@ -2,9 +2,6 @@ from flask import Flask, request, jsonify
 from waitress import serve
 from main import process_docx,add_img_to_cc
 import base64
-
-from ast import literal_eval
-
 app = Flask(__name__)
 PORT = "80"
 
