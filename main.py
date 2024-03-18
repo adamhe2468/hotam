@@ -1,9 +1,6 @@
 from docx import Document
 from io import BytesIO
 from docx.shared import Inches
-from docx.oxml import parse_xml
-from docx.oxml.ns import nsdecls
-from docx.oxml.ns import qn
 from PIL import Image
 import base64
 from lxml import etree
@@ -41,13 +38,18 @@ def add_img_to_cc(docx_content, signatures: dict):
         keys = list(doc.part.rels.keys())
         rid = keys[-1]
 
+        # Register namespaces
+        ns = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
+              "a": "http://schemas.openxmlformats.org/drawingml/2006/main",
+              "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships"}
+
         # Find the content control with the specified name or skip if not found
         for sdt in doc.element.xpath("w:sdt"):
-            alias = sdt.xpath("w:alias[@w:val='%s']" % cc_name)
+            alias = sdt.xpath(".//w:alias[@w:val='%s']" % cc_name)
             if alias:
                 # Set the relationship ID for the image
-                blip = sdt.xpath("a:blipFill/a:blip")[0]
-                blip.set(qn("r:embed"), rid)
+                blip = sdt.xpath(".//a:blipFill/a:blip")[0]
+                blip.set("{%s}embed" % ns["r"], rid)
                 break
 
     # Save the modified document content to a buffer
@@ -55,7 +57,6 @@ def add_img_to_cc(docx_content, signatures: dict):
     doc.save(modified_docx_buffer)
     modified_docx_content = modified_docx_buffer.getvalue()                 
     return modified_docx_content
-
 
 def process_docx(fields:dict, docx_content:bytes) -> bytes:
     doc = Document(BytesIO(docx_content))
