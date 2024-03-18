@@ -14,19 +14,20 @@ def add_img_to_cc(docx_content, img_dict):
         img_data_decoded = base64.b64decode(img_data.split(',')[1])
 
         # Add image to the document
-        img_stream = BytesIO(img_data_decoded)
-        doc.add_picture(img_stream, width=Inches(1))  # You can adjust the width as needed
-
-        # Find and replace the content control with the image
+        run = None
         for p in doc.paragraphs:
             if cc_name in p.text:
+                # Find the content control text
+                cc_index = p.text.find(cc_name)
                 # Clear the content control text
                 p.clear()
-
                 # Add the image to the paragraph
                 run = p.add_run()
-                run.add_picture(img_stream, width=Inches(1))  # You can adjust the width as needed
- # You can adjust the width as needed
+                run.add_picture(BytesIO(img_data_decoded), inline=True)
+                # Adjust the run to position the image exactly at the content control
+                run = p.runs[0]
+                break
+
 
     # Save the modified document content to a buffer
     modified_docx_buffer = BytesIO()
