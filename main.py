@@ -25,11 +25,11 @@ def add_img_to_cc(docx_content, signatures: dict):
     # Iterate over each content control and its corresponding image
     for cc_name, signature in signatures.items():
         # Open the signature image using PIL
-        image = Image.open(BytesIO(bytes(signature)))
+        image = Image.open(BytesIO(signature))
 
         # Add the image to the document
         width, height = image.size
-        doc.add_picture(BytesIO(bytes(signature)), width=Inches(width / 96))
+        doc.add_picture(BytesIO(signature), width=Inches(width / 96))
 
         # Remove the paragraph containing the image
         p = doc.paragraphs[-1]._element
