@@ -8,26 +8,26 @@ def add_img_to_cc(docx_content, img_dict):
     # Load the DOCX content
     doc = Document(BytesIO(docx_content))
 
-    # Iterate over the content controls and replace them with images
+    # Iterate over the paragraphs and replace content controls with images
     for cc_name, img_data in img_dict.items():
         # Decode base64 image data
         img_data_decoded = base64.b64decode(img_data.split(',')[1])
 
         # Add image to the document
-        run = None
-        for p in doc.paragraphs:
-            if cc_name in p.text:
-                # Find the content control text
-                cc_index = p.text.find(cc_name)
-                # Clear the content control text
-                p.clear()
-                # Add the image to the paragraph
-                run = p.add_run()
-                run.add_picture(BytesIO(img_data_decoded), inline=True)
-                # Adjust the run to position the image exactly at the content control
-                run = p.runs[0]
-                break
+        img_stream = BytesIO(img_data_decoded)
+        img_width = Inches(1)  # You can adjust the width as needed
+        img_height = Inches(1)  # You can adjust the height as needed
+        run = doc.add_paragraph().add_run()
+        run.add_picture(img_stream, width=img_width, height=img_height)
 
+        # Find and replace the content control with the image
+        for paragraph in doc.paragraphs:
+            if cc_name in paragraph.text:
+                paragraph.clear()  # Clear the entire paragraph
+                # Add the image to the paragraph
+                run = paragraph.add_run()
+                run.add_picture(img_stream, width=img_width, height=img_height)
+                break  # Exit loop after replacing the content control
 
     # Save the modified document content to a buffer
     modified_docx_buffer = BytesIO()
