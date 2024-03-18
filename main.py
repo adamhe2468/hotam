@@ -1,56 +1,30 @@
 from docx import Document
 from io import BytesIO
 from docx.shared import Inches
-from PIL import Image
 import base64
-from lxml import etree
 
-def add_img_to_cc(docx_content, signatures: dict):
-    """
-    Add images to content controls in a Word document.
 
-    Args:
-        docx_content (bytes): Content of the Word document.
-        signatures (dict): Dictionary mapping content control names to signature images.
-
-    Returns:
-        bytes: Modified Word document content.
-    """
+def add_img_to_cc(docx_content, img_dict):
+    # Load the DOCX content
     doc = Document(BytesIO(docx_content))
 
-    for cc_name, signature in signatures.items():
-        # Extract base64 data from the signature
-        base64_data = signature.split(",")[1]
-        image_data = base64.b64decode(base64_data)
-        
-        # Open the image using PIL
-        image = Image.open(BytesIO(image_data))
-        
-        # Add the image to the document
-        width, height = image.size
-        doc.add_picture(BytesIO(image_data), width=Inches(width / 96))
-        
-        # Remove the paragraph containing the image
-        p = doc.paragraphs[-1]._element
-        p.getparent().remove(p)
+    # Iterate over the content controls and replace them with images
+    for cc_name, img_data in img_dict.items():
+        # Decode base64 image data
+        img_data_decoded = base64.b64decode(img_data.split(',')[1])
 
-        # Finding the ID of the image
-        keys = list(doc.part.rels.keys())
-        rid = keys[-1]
+        # Add image to the document
+        img_stream = BytesIO(img_data_decoded)
+        doc.add_picture(img_stream, width=Inches(1))  # You can adjust the width as needed
 
-        # Register namespaces
-        ns = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
-              "a": "http://schemas.openxmlformats.org/drawingml/2006/main",
-              "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships"}
-
-        # Find the content control with the specified name or skip if not found
-        for sdt in doc.element.xpath("w:sdt"):
-            alias = sdt.xpath(".//w:alias[@w:val='%s']" % cc_name)
-            if alias:
-                # Set the relationship ID for the image
-                blip = sdt.xpath(".//a:blipFill/a:blip")[0]
-                blip.set("{%s}embed" % ns["r"], rid)
-                break
+        # Find and replace the content control with the image
+        for p in doc.paragraphs:
+            if cc_name in p.text:
+                inline = p.runs
+                for i in range(len(inline)):
+                    if cc_name in inline[i].text:
+                        inline[i].text = ""
+                        inline[i].add_picture(img_stream, width=Inches(1))  # You can adjust the width as needed
 
     # Save the modified document content to a buffer
     modified_docx_buffer = BytesIO()
