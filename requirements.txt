@@ -2,3 +2,4 @@ flask
 waitress
 python-docx
 pillow
+requests
