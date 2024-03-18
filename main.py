@@ -2,6 +2,8 @@ from docx import Document
 from io import BytesIO
 from docx.oxml.ns import qn
 from PIL import Image
+import base64
+import requests
 from docx.shared import Inches
 from docx.oxml import parse_xml
 from docx.oxml.ns import nsdecls
@@ -25,11 +27,12 @@ def add_img_to_cc(docx_content, signatures: dict):
     # Iterate over each content control and its corresponding image
     for cc_name, signature in signatures.items():
         # Open the signature image using PIL
-        image = Image.open(BytesIO(signature))
-
+        response = requests.get(signature)
+        image_data = base64.b64decode(response.content)
+        image = Image.open(BytesIO(image_data))
         # Add the image to the document
         width, height = image.size
-        doc.add_picture(BytesIO(signature), width=Inches(width / 96))
+        doc.add_picture(BytesIO(image_data), width=Inches(width / 96))
 
         # Remove the paragraph containing the image
         p = doc.paragraphs[-1]._element
