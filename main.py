@@ -28,15 +28,14 @@ def add_img_to_cc(docx_content, img_dict):
     p.getparent().remove(p)
     
     # finding the id of the image
- for cc_name, img_data in img_dict.items():
-   
-   keys = list(doc.part.rels.keys())
+ 
+ keys = list(doc.part.rels.keys())
 
     # the rid of the picture we wanna add its also the last key in the list
     # rid = keys[-1]    # search for the image content control
     
-   pic_ccs = doc._element.xpath("//a:blip")
- index = -1
+ pic_ccs = doc._element.xpath("//a:blip")
+ index = -2
     # iterating over the list of all the picture content controls
  for pic in pic_ccs:
       for name in pics_names:
@@ -47,12 +46,10 @@ def add_img_to_cc(docx_content, img_dict):
             temp.getparent().remove(temp)
           except:
             print("already gone") 
-      index -=1
+      index = index+1
  modified_docx_buffer = BytesIO()
  doc.save(modified_docx_buffer)
- modified_docx_content = modified_docx_buffer.getvalue()
- with open("output.docx","wb") as f:
-        f.write(modified_docx_content)                 
+ modified_docx_content = modified_docx_buffer.getvalue()                 
  return modified_docx_content
 def process_docx(fields:dict, docx_content:bytes) -> bytes:
     doc = Document(BytesIO(docx_content))
