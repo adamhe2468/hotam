@@ -28,8 +28,8 @@ def process():
     for item in json_list:
      dictionary[item['key']] = item['value']
      # first fill the text fields
-    signatures= {"Picture1":law_sig,
-                 "Picture2": costumer_sig}
+    signatures= {"Picture 1":law_sig,
+                 "Picture 2": costumer_sig}
     modified_docx_content = process_docx(dictionary, docx_content)
     # insert the signatures
     modified_docx_content =  add_img_to_cc(modified_docx_content,signatures)  
