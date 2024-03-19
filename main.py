@@ -13,38 +13,41 @@ def add_img_to_cc(docx_content, img_dict):
  doc = Document(BytesIO(docx_content))
  real_pics = doc._element.xpath("//pic:cNvPr")
  pics_names = []
+ 
  for real_pic in real_pics:
-    pics_names.append(real_pic.name)
- i = -1      
+    pics_names.append(real_pic.name)   
  for cc_name, img_data in img_dict.items():
         # Decode base64 image data
     img_data_decoded = base64.b64decode(img_data.split(',')[1])
-
+    
         # Add image to the document
     img_stream = BytesIO(img_data_decoded)
     # adding the image and removing it to create a rel between the document and the image
     doc.add_picture(img_stream)
- p = doc.paragraphs[-1]._element
- p.getparent().remove(p)
-
+    p = doc.paragraphs[-1]._element
+    p.getparent().remove(p)
+    
     # finding the id of the image
- keys = list(doc.part.rels.keys())
+ for cc_name, img_data in img_dict.items():
+   
+   keys = list(doc.part.rels.keys())
 
     # the rid of the picture we wanna add its also the last key in the list
- rid = keys[i]    # search for the image content control
+    # rid = keys[-1]    # search for the image content control
     
- pic_ccs = doc._element.xpath("//a:blip")
-
+   pic_ccs = doc._element.xpath("//a:blip")
+ index = -1
     # iterating over the list of all the picture content controls
  for pic in pic_ccs:
       for name in pics_names:
         if(name == cc_name):    
-          pic.set(qn("r:embed"), rid)
+          pic.set(qn("r:embed"), keys[index])
           try:
             temp = doc._element.xpath("//w:sdtPr")[0]
             temp.getparent().remove(temp)
           except:
             print("already gone") 
+      index -=1
  modified_docx_buffer = BytesIO()
  doc.save(modified_docx_buffer)
  modified_docx_content = modified_docx_buffer.getvalue()
