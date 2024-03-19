@@ -9,13 +9,9 @@ from xml.etree import ElementTree as ET
 from docx.oxml.ns import qn
 
 def add_img_to_cc(docx_content, img_dict):
-
- doc = Document(BytesIO(docx_content))
- real_pics = doc._element.xpath("//pic:cNvPr")
- pics_names = []
  
- for real_pic in real_pics:
-    pics_names.append(real_pic.name)   
+ doc = Document(BytesIO(docx_content))
+ pics_dic = {}  
  for cc_name, img_data in img_dict.items():
         # Decode base64 image data
     img_data_decoded = base64.b64decode(img_data.split(',')[1])
@@ -29,29 +25,33 @@ def add_img_to_cc(docx_content, img_dict):
     
     # finding the id of the image
  
- keys = list(doc.part.rels.keys())
-
-    # the rid of the picture we wanna add its also the last key in the list
-    # rid = keys[-1]    # search for the image content control
+    keys = list(doc.part.rels.keys())
     
+    # the rid of the picture we wanna add its also the last key in the list
+   # search for the image content control
+   #rid= keys[-1]
+    pics_dic[cc_name]= keys[-1]   
  pic_ccs = doc._element.xpath("//a:blip")
- index = -2
-    # iterating over the list of all the picture content controls
+     # iterating over the list of all the picture content controls
+ i = 0 
  for pic in pic_ccs:
-      for name in pics_names:
-        if(name == cc_name):    
-          pic.set(qn("r:embed"), keys[index])
+      real_name = pic_ccs[0].xpath("//pic:cNvPr")[i].name
+      for name,rid in pics_dic.items():
+        if(name == real_name ):  
+          pic.set(qn("r:embed"), rid)
           try:
             temp = doc._element.xpath("//w:sdtPr")[0]
             temp.getparent().remove(temp)
           except:
-            print("already gone") 
-      index = index+1
+            print("already gone")         
+      i = i +1 
+   # getting the content                 
  modified_docx_buffer = BytesIO()
  doc.save(modified_docx_buffer)
  modified_docx_content = modified_docx_buffer.getvalue()                 
  return modified_docx_content
 def process_docx(fields:dict, docx_content:bytes) -> bytes:
+  
     doc = Document(BytesIO(docx_content))
 
     # Iterate through each content control in the document
