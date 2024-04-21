@@ -26,7 +26,8 @@ def process():
 # Construct the dictionary
     dictionary = {}
     for item in json_list:
-     dictionary[item['key']] = item['value']
+        if "<" not in item['value'] and ">" not in item["value"] and len(item["value"]< 50):
+             dictionary[item['key']] = item['value']
      # first fill the text fields
     signatures= {"Picture 1":law_sig,
                  "Picture 2": costumer_sig}
