@@ -8,7 +8,7 @@ app = Flask(__name__)
 PORT = "80"
 
 @app.route('/process', methods=['POST'])
-def process():
+def process() -> dict:
     """
     gets data from the automation and process the docx content to fill the fields
     """
@@ -26,8 +26,12 @@ def process():
 # Construct the dictionary
     dictionary = {}
     for item in json_list:
+        # security check to prevent file injections
         if "<" not in item['value'] and ">" not in item["value"] and len(item["value"]< 50):
              dictionary[item['key']] = item['value']
+        else:
+            return jsonify({"Message":f"{item['value']} contains < or > or has more than 50 characters"}), 400
+            
      # first fill the text fields
     signatures= {"Picture 1":law_sig,
                  "Picture 2": costumer_sig}
