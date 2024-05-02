@@ -27,7 +27,7 @@ def process() -> dict:
     dictionary = {}
     for item in json_list:
         # security check to prevent file injections
-        if "<" not in item['value'] and ">" not in item["value"] and len(item["value"]< 50):
+        if "<" not in item['value'] and ">" not in item["value"] and len(item["value"])< 50:
              dictionary[item['key']] = item['value']
         else:
             return jsonify({"Message":f"{item['value']} contains < or > or has more than 50 characters"}), 400
