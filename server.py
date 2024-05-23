@@ -33,16 +33,26 @@ def process() -> dict:
             return jsonify({"Message":f"{item['value']} contains < or > or has more than 50 characters"}), 400
             
      # first fill the text fields
-    signatures= {"Picture 1":law_sig,
-                 "Picture 2": costumer_sig}
+    no_sig== False
+    if(law_sig=="" and costumer_sig==""):
+      no_sig = True 
+    elif(costumer_sig==""):   
+     signatures= {"Picture 1":law_sig}
+    elif(law_sig==""):
+      signatures={
+                 "Picture 2": costumer_sig}  
+    else:
+      signatures= {"Picture 1":law_sig,
+                 "Picture 2": costumer_sig}  
+        
     modified_docx_content = process_docx(dictionary, docx_content)
     # insert the signatures
-    modified_docx_content =  add_img_to_cc(modified_docx_content,signatures)  
+    if(no_sig== False ):
+     modified_docx_content =  add_img_to_cc(modified_docx_content,signatures)  
         # Encode the modified DOCX content
     modified_docx_encoded = base64.b64encode(modified_docx_content).decode('utf-8')
         
     return jsonify({"file": {    "$content-type": docx_type,"$content": modified_docx_encoded}})
     
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=PORT)
-    # serve(app, host = "0.0.0.0", port = PORT)
+    serve(app, host = "0.0.0.0", port = PORT)
