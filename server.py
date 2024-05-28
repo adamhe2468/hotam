@@ -33,7 +33,7 @@ def process() -> dict:
             return jsonify({"Message":f"{item['value']} contains < or > or has more than 50 characters"}), 400
             
      # first fill the text fields
-    no_sig== False
+    no_sig = False
     if(law_sig=="" and costumer_sig==""):
       no_sig = True 
     elif(costumer_sig==""):   
